@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop | Votre Boutique En Ligne</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght=400;600;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { cairo: ['Cairo', 'sans-serif'] },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'pulse-slow': 'pulse 4s cubic-bezier(0.4,0,0.6,1) infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-20px)' },
+            },
+          },
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    :root {
+      --bg-base: #020617;
+      --bg-surface: #0f172a;
+      --nav-bg: rgba(7,15,40,0.8);
+      --nav-border: rgba(99,102,241,0.2);
+    }
+    body { font-family: 'Cairo', sans-serif; background: var(--bg-base); color: #f8fafc; }
+
+    .nav-blur {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      background: var(--nav-bg);
+      border-bottom: 1px solid var(--nav-border);
+    }
+
+    .hero-bg {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 30%, #4338ca 60%, #6366f1 100%);
+    }
+
+    .hero-blob {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(80px);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .wave-divider {
+      position: relative;
+      overflow: hidden;
+    }
+    .wave-divider::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0;
+      width: 200%; height: 80px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%23020617' fill-opacity='1' d='M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z'/%3E%3C/svg%3E") repeat-x bottom;
+      background-size: 1440px 80px;
+      animation: waveMarch 8s linear infinite;
+    }
+    @keyframes waveMarch { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    .page-section { display: none; }
+    .page-section.active { display: block; }
+
+    .glow-btn:hover { box-shadow: 0 0 30px rgba(99,102,241,0.6), 0 0 60px rgba(99,102,241,0.3); }
+    .card-glow:hover { box-shadow: 0 0 40px rgba(99,102,241,0.3), 0 8px 32px rgba(0,0,0,0.4); }
+
+    .tab-active { background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; }
+
+    #theme-toggle {
+      position: relative; width: 52px; height: 28px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border: 1.5px solid rgba(99,102,241,0.4);
+      cursor: pointer; transition: all 0.4s ease; flex-shrink: 0;
+    }
+    #theme-toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 20px; height: 20px; border-radius: 9999px;
+      background: white; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      display: flex; align-items: center; justify-content: center; font-size: 11px;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 3px; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.6s ease forwards; }
+    .delay-1 { animation-delay: 0.1s; opacity:0; }
+    .delay-2 { animation-delay: 0.25s; opacity:0; }
+    .delay-3 { animation-delay: 0.4s; opacity:0; }
+
+    .notif {
+      position: fixed; top: 1.5rem; right: 1.5rem;
+      padding: 12px 20px; border-radius: 12px;
+      font-size: 13px; font-weight: 700;
+      display: none; z-index: 9999;
+      animation: fadeUp 0.3s ease forwards;
+    }
+  </style>
+</head>
+<body class="min-h-screen">
+
+  <!-- ── NAVBAR ── -->
+  <nav class="nav-blur fixed top-0 left-0 right-0 z-50 px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-2 cursor-pointer" onclick="showPage('home')">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+          <i class="fa-solid fa-bag-shopping text-white text-base"></i>
+        </div>
+        <span class="text-xl font-black bg-gradient-to-r from-indigo-300 to-purple-400 bg-clip-text text-transparent tracking-tight">Shop</span>
+      </div>
+
+      <ul class="hidden md:flex items-center gap-8">
+        <li><a href="#" onclick="showPage('home')" class="text-slate-300 hover:text-indigo-300 text-sm font-semibold transition-colors">Accueil</a></li>
+        <li><a href="#" onclick="showPage('products')" class="text-slate-300 hover:text-indigo-300 text-sm font-semibold transition-colors">Produits</a></li>
+        <li><a href="#" onclick="showPage('events')" class="text-slate-300 hover:text-indigo-300 text-sm font-semibold transition-colors">Événements</a></li>
+        <li><a href="#" onclick="showPage('cart')" class="text-slate-300 hover:text-indigo-300 text-sm font-semibold transition-colors">Panier</a></li>
+        <li><a href="#" onclick="showPage('orders')" class="text-slate-300 hover:text-indigo-300 text-sm font-semibold transition-colors">Mes Commandes</a></li>
+      </ul>
+
+      <div class="flex items-center gap-3">
+        <button id="theme-toggle" onclick="toggleTheme()" title="Changer le thème">
+          <div id="theme-toggle-thumb"><span id="theme-icon">🌙</span></div>
+        </button>
+        <button onclick="window.location.href='login.html'" id="nav-auth-btn"
+  class="glow-btn bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-all duration-300 transform hover:scale-105">
+  Se connecter
+</button>
+        <button id="nav-logout-btn" onclick="doLogout()"
+          class="hidden bg-red-900/30 hover:bg-red-900/60 text-red-400 text-sm font-bold px-5 py-2.5 rounded-xl transition-all border border-red-800/50">
+          Déconnexion
+        </button>
+        <button class="md:hidden text-slate-300" onclick="toggleMobileMenu()">
+          <i class="fa-solid fa-bars text-xl"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden hidden mt-4 pb-4 border-t border-slate-700/50">
+      <ul class="flex flex-col gap-3 pt-4">
+        <li><a href="#" onclick="showPage('home'); toggleMobileMenu()" class="block text-slate-300 hover:text-indigo-300 text-sm font-semibold px-2 transition-colors">Accueil</a></li>
+        <li><a href="#" onclick="showPage('products'); toggleMobileMenu()" class="block text-slate-300 hover:text-indigo-300 text-sm font-semibold px-2 transition-colors">Produits</a></li>
+        <li><a href="#" onclick="showPage('events'); toggleMobileMenu()" class="block text-slate-300 hover:text-indigo-300 text-sm font-semibold px-2 transition-colors">Événements</a></li>
+        <li><a href="#" onclick="showPage('cart'); toggleMobileMenu()" class="block text-slate-300 hover:text-indigo-300 text-sm font-semibold px-2 transition-colors">Panier</a></li>
+        <li><a href="#" onclick="showPage('orders'); toggleMobileMenu()" class="block text-slate-300 hover:text-indigo-300 text-sm font-semibold px-2 transition-colors">Mes Commandes</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="pt-20">
+
+    <!-- ══ HOME ══ -->
+    <section id="home" class="page-section active">
+      <div class="relative hero-bg min-h-screen flex items-center justify-center overflow-hidden wave-divider">
+        <!-- Blobs -->
+        <div class="hero-blob w-96 h-96 bg-indigo-400" style="top:5%;left:-5%;"></div>
+        <div class="hero-blob w-80 h-80 bg-purple-500" style="bottom:15%;right:5%;"></div>
+        <div class="hero-blob w-64 h-64 bg-violet-300" style="top:50%;left:45%;"></div>
+
+        <!-- Floating icons -->
+        <div class="absolute top-24 right-20 text-indigo-300/20 text-8xl animate-float" style="animation-delay:0s;">
+          <i class="fa-solid fa-bag-shopping"></i>
+        </div>
+        <div class="absolute bottom-40 left-16 text-purple-300/20 text-6xl animate-float" style="animation-delay:2s;">
+          <i class="fa-solid fa-tag"></i>
+        </div>
+        <div class="absolute top-1/3 right-1/3 text-violet-200/15 text-4xl animate-float" style="animation-delay:4s;">
+          <i class="fa-solid fa-star"></i>
+        </div>
+
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+
+          <h1 class="text-5xl md:text-7xl font-black leading-none mb-6 fade-up delay-1">
+            <span class="bg-gradient-to-r from-white via-indigo-100 to-indigo-300 bg-clip-text text-transparent">Votre Boutique</span>
+            <br>
+            <span class="bg-gradient-to-r from-indigo-300 via-purple-300 to-violet-200 bg-clip-text text-transparent">En Ligne</span>
+          </h1>
+
+          <p class="text-slate-300 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed fade-up delay-2">
+            Une plateforme e-commerce complète construite avec <span class="text-indigo-300 font-bold">Node.js</span> — Gestion des produits, du panier, des commandes et des événements en un seul endroit.
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center fade-up delay-3">
+            <button onclick="showPage('products')"
+              class="glow-btn bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-bold px-10 py-4 rounded-2xl text-lg transition-all duration-300 transform hover:scale-105">
+              Parcourir les produits <i class="fa-solid fa-bag-shopping ml-2"></i>
+            </button>
+            <a href="login.html" class="glass text-white font-semibold px-10 py-4 rounded-2xl text-lg hover:bg-white/20 transition-all duration-300 inline-block">Se connecter <i class="fa-solid fa-arrow-right ml-2"></i></a>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-3 gap-6 mt-20 max-w-lg mx-auto fade-up delay-3">
+            <div class="text-center">
+              <div class="text-3xl font-black text-indigo-300">1000+</div>
+              <div class="text-slate-400 text-xs mt-1">Produits disponibles</div>
+            </div>
+            <div class="text-center border-x border-slate-700/50">
+              <div class="text-3xl font-black text-indigo-300">JWT</div>
+              <div class="text-slate-400 text-xs mt-1">Authentification Sécurisée</div>
+            </div>
+            <div class="text-center">
+              <div class="text-3xl font-black text-indigo-300">🇹🇳</div>
+              <div class="text-slate-400 text-xs mt-1">Made in Tunisia</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features Section -->
+      <div class="bg-slate-950 py-24 px-6">
+        <div class="max-w-6xl mx-auto">
+          <div class="text-center mb-16">
+            <span class="text-indigo-400 text-sm font-bold tracking-widest uppercase">Fonctionnalités de la plateforme</span>
+            <h2 class="text-4xl md:text-5xl font-black mt-3 bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">Tout ce dont vous avez besoin</h2>
+          </div>
+
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+
+            <div class="card-glow group rounded-3xl bg-gradient-to-b from-slate-800/80 to-slate-900/80 border border-slate-700/50 hover:border-purple-500/50 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div class="w-14 h-14 rounded-2xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-boxes-stacked text-purple-400 text-xl"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Gestion des Produits</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">CRUD complet pour les produits avec catégories et téléchargement d'images.</p>
+            </div>
+
+            <div class="card-glow group rounded-3xl bg-gradient-to-b from-slate-800/80 to-slate-900/80 border border-slate-700/50 hover:border-violet-500/50 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div class="w-14 h-14 rounded-2xl bg-violet-500/20 border border-violet-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-cart-shopping text-violet-400 text-xl"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Panier d'achat</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">Ajoutez, mettez à jour et supprimez facilement des produits du panier.</p>
+            </div>
+
+            <div class="card-glow group rounded-3xl bg-gradient-to-b from-slate-800/80 to-slate-900/80 border border-slate-700/50 hover:border-green-500/50 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div class="w-14 h-14 rounded-2xl bg-green-500/20 border border-green-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-receipt text-green-400 text-xl"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Gestion des Commandes</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">Suivi des commandes avec statuts : en attente, expédiée, livrée.</p>
+            </div>
+
+            <div class="card-glow group rounded-3xl bg-gradient-to-b from-slate-800/80 to-slate-900/80 border border-slate-700/50 hover:border-cyan-500/50 p-6 transition-all duration-300 hover:-translate-y-2">
+              <div class="w-14 h-14 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <i class="fa-solid fa-calendar-days text-cyan-400 text-xl"></i>
+              </div>
+              <h3 class="text-lg font-bold text-white mb-2">Événements</h3>
+              <p class="text-slate-400 text-sm leading-relaxed">Création et gestion d'événements avec date et lieu.</p>
+            </div>
+
+           
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ AUTH PAGE ══ -->
+    <section id="auth" class="page-section">
+      <div class="min-h-screen bg-slate-950 flex items-center justify-center py-32 px-6">
+        <div class="w-full max-w-md">
+          <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-400 to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/30">
+              <i class="fa-solid fa-bag-shopping text-white text-2xl"></i>
+            </div>
+            <h1 class="text-2xl font-black text-white">ShopAPI</h1>
+            <p class="text-slate-400 text-sm mt-1">Rejoignez la plateforme</p>
+          </div>
+
+          <div class="rounded-3xl bg-slate-900/80 border border-slate-700/50 p-8 backdrop-blur-sm">
+            <!-- Tabs -->
+            <div class="flex rounded-2xl bg-slate-800/60 p-1.5 mb-8">
+              <button id="tab-login" onclick="switchAuth('login')" class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 tab-active">Connexion</button>
+              <button id="tab-signup" onclick="switchAuth('signup')" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-white transition-all duration-300">S'inscrire</button>
+            </div>
+
+            <div id="auth-msg" class="hidden mb-4 px-4 py-3 rounded-xl text-sm font-bold"></div>
+
+            <!-- Login Form -->
+            <div id="login-form">
+              <h3 class="text-2xl font-black text-white mb-6">Bienvenue 👋</h3>
+              <div class="space-y-4">
+                <div class="group">
+                  <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">E-mail</label>
+                  <div class="relative">
+                    <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors text-sm"></i>
+                    <input type="email" id="l-email" placeholder="admin@test.com" value="admin@test.com"
+                      class="w-full bg-slate-800/60 border border-slate-700 focus:border-indigo-500 text-white placeholder-slate-500 rounded-xl px-4 py-3 pl-11 text-sm outline-none transition-all">
+                  </div>
+                </div>
+                <div class="group">
+                  <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Mot de passe</label>
+                  <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors text-sm"></i>
+                    <input type="password" id="l-password" placeholder="••••••••" value="123456"
+                      class="w-full bg-slate-800/60 border border-slate-700 focus:border-indigo-500 text-white placeholder-slate-500 rounded-xl px-4 py-3 pl-11 text-sm outline-none transition-all">
+                  </div>
+                </div>
+                <a href="login.html" class="glass text-white font-semibold px-10 py-4 rounded-2xl text-lg hover:bg-white/20 transition-all duration-300 inline-block">Se connecter <i class="fa-solid fa-arrow-right ml-2"></i></a>
+          
+              </div>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" style="display:none;">
+              <h3 class="text-2xl font-black text-white mb-6">Créer un compte 🚀</h3>
+              <div class="space-y-4">
+                <div class="group">
+                  <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Nom</label>
+                  <div class="relative">
+                    <i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors text-sm"></i>
+                    <input type="text" id="r-name" placeholder="Votre nom complet"
+                      class="w-full bg-slate-800/60 border border-slate-700 focus:border-indigo-500 text-white placeholder-slate-500 rounded-xl px-4 py-3 pl-11 text-sm outline-none transition-all">
+                  </div>
+                </div>
+                <div class="group">
+                  <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">E-mail</label>
+                  <div class="relative">
+                    <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors text-sm"></i>
+                    <input type="email" id="r-email" placeholder="email@example.com"
+                      class="w-full bg-slate-800/60 border border-slate-700 focus:border-indigo-500 text-white placeholder-slate-500 rounded-xl px-4 py-3 pl-11 text-sm outline-none transition-all">
+                  </div>
+                </div>
+                <div class="group">
+                  <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Mot de passe</label>
+                  <div class="relative">
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400 transition-colors text-sm"></i>
+                    <input type="password" id="r-password" placeholder="••••••••"
+                      class="w-full bg-slate-800/60 border border-slate-700 focus:border-indigo-500 text-white placeholder-slate-500 rounded-xl px-4 py-3 pl-11 text-sm outline-none transition-all">
+                  </div>
+                </div>
+                <div class="group">
+                  <label class="block text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">Rôle</label>
+                  <select id="r-role"
+                    class="w-full bg-slate-800/60 border border-slate-700 focus:border-indigo-500 text-white rounded-xl px-4 py-3 text-sm outline-none transition-all">
+                    <option value="user">User — Utilisateur standard</option>
+                    <option value="admin">Admin — Administrateur</option>
+                  </select>
+                </div>
+                <button type="button" onclick="doRegister()"
+                  class="glow-btn w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-400 hover:to-purple-500 text-white font-black py-3.5 rounded-xl mt-2 transition-all duration-300 hover:scale-[1.02]">
+                  Créer le compte <i class="fa-solid fa-arrow-left mr-2"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ PRODUCTS PAGE ══ -->
+    <section id="products" class="page-section">
+      <div class="min-h-screen bg-slate-950 py-28 px-6">
+        <div class="max-w-7xl mx-auto">
+          <div class="flex items-center justify-between mb-10">
+            <div>
+              <span class="text-indigo-400 text-sm font-bold tracking-widest uppercase">Boutique</span>
+              <h2 class="text-4xl font-black text-white mt-1">Produits</h2>
+            </div>
+            <button onclick="openProductModal()"
+              class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:-translate-y-0.5">
+              <i class="fa-solid fa-plus"></i> Nouveau produit
+            </button>
+          </div>
+
+          <input type="text" id="p-search" oninput="filterProducts()"
+            class="w-full max-w-md px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm mb-8"
+            placeholder="Rechercher un produit...">
+
+          <div id="p-alert" class="hidden mb-4 px-4 py-3 rounded-xl text-sm font-bold"></div>
+          <div id="p-loading" class="text-center py-20 text-slate-500">Chargement en cours...</div>
+          <div id="p-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+          <div id="p-empty" class="hidden text-center py-20">
+            <div class="text-6xl mb-4">📦</div>
+            <p class="text-slate-400 font-bold text-lg">Aucun produit trouvé</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ CART PAGE ══ -->
+    <section id="cart" class="page-section">
+      <div class="min-h-screen bg-slate-950 py-28 px-6">
+        <div class="max-w-6xl mx-auto">
+          <div class="mb-10">
+            <span class="text-indigo-400 text-sm font-bold tracking-widest uppercase">Vos achats</span>
+            <h2 class="text-4xl font-black text-white mt-1">Mon Panier 🛒</h2>
+          </div>
+          <div id="c-alert" class="hidden mb-4 px-4 py-3 rounded-xl text-sm font-bold"></div>
+          <div id="c-loading" class="text-center py-20 text-slate-500">Chargement en cours...</div>
+          <div id="c-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6"></div>
+          <div id="c-empty" class="hidden text-center py-20">
+            <div class="text-6xl mb-4">🛒</div>
+            <p class="text-slate-400 font-bold text-lg">Le panier est vide</p>
+            <button onclick="showPage('products')" class="mt-4 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all">Parcourir les produits</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ ORDERS PAGE ══ -->
+    <section id="orders" class="page-section">
+      <div class="min-h-screen bg-slate-950 py-28 px-6">
+        <div class="max-w-4xl mx-auto">
+          <div class="mb-10">
+            <span class="text-indigo-400 text-sm font-bold tracking-widest uppercase">Votre historique</span>
+            <h2 class="text-4xl font-black text-white mt-1">Mes Commandes 📦</h2>
+          </div>
+          <div id="o-loading" class="text-center py-20 text-slate-500">Chargement en cours...</div>
+          <div id="o-list" class="hidden space-y-4"></div>
+          <div id="o-empty" class="hidden text-center py-20">
+            <div class="text-6xl mb-4">📋</div>
+            <p class="text-slate-400 font-bold text-lg">Aucune commande pour le moment</p>
+            <button onclick="showPage('products')" class="mt-4 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-sm transition-all">Commencer vos achats</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ EVENTS PAGE ══ -->
+    <section id="events" class="page-section">
+      <div class="min-h-screen bg-slate-950 py-28 px-6">
+        <div class="max-w-6xl mx-auto">
+          <div class="flex items-center justify-between mb-10">
+            <div>
+              <span class="text-indigo-400 text-sm font-bold tracking-widest uppercase">Calendrier</span>
+              <h2 class="text-4xl font-black text-white mt-1">Événements 🗓️</h2>
+            </div>
+            <button onclick="openEventModal()"
+              class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:-translate-y-0.5">
+              <i class="fa-solid fa-plus"></i> Nouvel événement
+            </button>
+          </div>
+          <div id="e-alert" class="hidden mb-4 px-4 py-3 rounded-xl text-sm font-bold"></div>
+          <div id="e-loading" class="text-center py-20 text-slate-500">Chargement en cours...</div>
+          <div id="e-grid" class="hidden grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+          <div id="e-empty" class="hidden text-center py-20">
+            <div class="text-6xl mb-4">🗓️</div>
+            <p class="text-slate-400 font-bold text-lg">Aucun événement pour le moment</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── MODALS ── -->
+  <!-- Product Modal -->
+  <div id="product-modal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" style="backdrop-filter:blur(4px)">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-black text-white">Ajouter un nouveau produit</h3>
+        <button onclick="closeProductModal()" class="text-slate-400 hover:text-white transition-colors text-xl">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div><label class="block text-slate-300 text-sm font-bold mb-1">Nom du produit</label>
+          <input type="text" id="pm-title" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500"></div>
+        <div><label class="block text-slate-300 text-sm font-bold mb-1">Description</label>
+          <textarea id="pm-desc" rows="2" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500 resize-none"></textarea></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="block text-slate-300 text-sm font-bold mb-1">Prix ($)</label>
+            <input type="number" id="pm-price" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500"></div>
+          <div><label class="block text-slate-300 text-sm font-bold mb-1">Stock</label>
+            <input type="number" id="pm-stock" value="0" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500"></div>
+        </div>
+        <div><label class="block text-slate-300 text-sm font-bold mb-1">ID de la catégorie</label>
+          <input type="text" id="pm-cat" placeholder="ObjectId de MongoDB" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500"></div>
+        <button onclick="createProduct()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl transition-all text-sm mt-2">Ajouter le produit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event Modal -->
+  <div id="event-modal" class="hidden fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" style="backdrop-filter:blur(4px)">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-black text-white">Ajouter un nouvel événement</h3>
+        <button onclick="closeEventModal()" class="text-slate-400 hover:text-white transition-colors text-xl">✕</button>
+      </div>
+      <div class="space-y-3">
+        <div><label class="block text-slate-300 text-sm font-bold mb-1">Titre de l'événement</label>
+          <input type="text" id="em-title" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500"></div>
+        <div><label class="block text-slate-300 text-sm font-bold mb-1">Description</label>
+          <textarea id="em-desc" rows="2" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500 resize-none"></textarea></div>
+        <div><label class="block text-slate-300 text-sm font-bold mb-1">Date</label>
+          <input type="date" id="em-date" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500"></div>
+        <div><label class="block text-slate-300 text-sm font-bold mb-1">Lieu</label>
+          <input type="text" id="em-location" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500"></div>
+        <button onclick="createEvent()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-xl transition-all text-sm mt-2">Ajouter l'événement</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

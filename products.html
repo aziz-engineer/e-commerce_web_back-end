@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Produits - Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+    .card { animation: fadeUp 0.4s ease forwards; }
+    .modal-bg { backdrop-filter: blur(4px); }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+
+  <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+      </div>
+      <span class="text-white font-black text-lg">Shop</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <a href="products.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-600/30">Produits</a>
+      <a href="events.html" class="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">Événements</a>
+      <a href="cart.html" class="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">Panier</a>
+      <a href="orders.html" class="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">Mes Commandes</a>
+      <button onclick="logout()" class="ml-2 px-4 py-2 bg-red-900/30 hover:bg-red-900/60 text-red-400 text-sm font-semibold rounded-lg transition-all border border-red-800/50">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="max-w-7xl mx-auto px-6 py-8">
+
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-black text-white">Produits</h1>
+        <p class="text-slate-400 text-sm mt-1">Gérer tous les produits de la boutique</p>
+      </div>
+      <button onclick="openModal()" class="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:-translate-y-0.5 text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Nouveau produit
+      </button>
+    </div>
+
+    <div class="mb-6">
+      <input type="text" id="search" oninput="filterProducts()"
+        class="w-full max-w-md px-4 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 text-sm"
+        placeholder="Rechercher un produit...">
+    </div>
+
+    <div id="alert" class="hidden mb-4 px-4 py-3 rounded-xl text-sm font-semibold"></div>
+
+    <div id="loading" class="text-center py-20 text-slate-500">Chargement en cours...</div>
+
+    <div id="grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+
+    <div id="empty" class="hidden text-center py-20">
+      <div class="text-5xl mb-4">📦</div>
+      <p class="text-slate-400 font-semibold">Aucun produit pour le moment</p>
+      <p class="text-slate-600 text-sm">Cliquez sur "Nouveau produit" pour ajouter votre premier article</p>
+    </div>
+  </div>
+
+  <div id="modal" class="hidden fixed inset-0 bg-black/70 modal-bg z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl p-6 w-full max-w-md shadow-2xl">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="text-lg font-bold text-white">Ajouter un nouveau produit</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <form onsubmit="createProduct(event)" class="space-y-3">
+        <div>
+          <label class="block text-slate-300 text-sm font-semibold mb-1">Nom du produit</label>
+          <input type="text" id="p-title" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500" required>
+        </div>
+        <div>
+          <label class="block text-slate-300 text-sm font-semibold mb-1">Description</label>
+          <textarea id="p-desc" rows="2" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500 resize-none"></textarea>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 text-sm font-semibold mb-1">Prix ($)</label>
+            <input type="number" id="p-price" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500" required>
+          </div>
+          <div>
+            <label class="block text-slate-300 text-sm font-semibold mb-1">Stock</label>
+            <input type="number" id="p-stock" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500" value="0">
+          </div>
+        </div>
+        <div>
+          <label class="block text-slate-300 text-sm font-semibold mb-1">ID de la Catégorie</label>
+          <input type="text" id="p-category" class="w-full px-3 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500" placeholder="ObjectId de MongoDB" required>
+        </div>
+        <button type="submit" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all text-sm mt-2">
+          Ajouter le produit
+        </button>
+      </form>
+    </div>
+  </div>
+
+ 
+</body>
+</html>

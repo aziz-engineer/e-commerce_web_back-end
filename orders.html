@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Commandes - Shop</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style> body { font-family: 'Cairo', sans-serif; } </style>
+</head>
+<body class="min-h-screen bg-slate-950 text-white">
+
+  <nav class="bg-slate-900 border-b border-slate-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+      </div>
+      <span class="text-white font-black text-lg">Shop</span>
+    </div>
+    <div class="flex items-center gap-1">
+      <a href="products.html" class="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">Produits</a>
+      <a href="events.html" class="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">Événements</a>
+      <a href="cart.html" class="px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all">Panier</a>
+      <a href="orders.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-indigo-600/20 text-indigo-400 border border-indigo-600/30">Mes Commandes</a>
+      <button onclick="logout()" class="ml-2 px-4 py-2 bg-red-900/30 hover:bg-red-900/60 text-red-400 text-sm font-semibold rounded-lg transition-all border border-red-800/50">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="max-w-4xl mx-auto px-6 py-8">
+    <div class="mb-8">
+      <h1 class="text-2xl font-black text-white">Mes Commandes 📦</h1>
+      <p class="text-slate-400 text-sm mt-1">Historique de toutes vos commandes</p>
+    </div>
+
+    
+    <div id="list" class="hidden space-y-4"></div>
+    
+    <div id="empty" class="hidden text-center py-20">
+      <div class="text-6xl mb-4">📋</div>
+      <p class="text-slate-400 font-bold text-lg">Aucune commande pour le moment</p>
+      <a href="products.html" class="inline-block mt-4 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-sm transition-all">
+        Commencer mes achats
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>
